@@ -7,6 +7,10 @@
  *   Amiga's volumes come from DOS.
  * - Pseudo-terminals: none, and no fork: forkpty fails with ENOSYS.
  * - nftw: a walk with opendir and lstat; mknod: no device files (ENOSYS).
+ * - lchown: no owners (ENOSYS); lutimes: the file's date through utime
+ *   (AmigaDOS has no access time and links aren't followed by it anyway).
+ * - mkdtemp, here so libnix's mktemp.o (whose mkstemp the toolkit also
+ *   has) isn't linked; pause, for 4Pane's debugger wait.
  *
  * Copyright (c) 2026 AmiCradle Team
  */
@@ -24,6 +28,9 @@
 #include <stdlib.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <sys/time.h>
+#include <utime.h>
+#include <time.h>
 
 #define ONE_USER "user"
 #define ONE_GROUP "users"
@@ -93,6 +100,13 @@ static int fill_group(struct group *grp, char *buf, size_t buflen, struct group 
 
 /* the enumerations give the one entry, then NULL, then start again */
 static int pw_next, gr_next;
+
+/* libsocket's own would bring its getpwuid and getpwnam, which the
+ * toolkit has already */
+void setpwent(void) { pw_next = 0; }
+void endpwent(void) { pw_next = 0; }
+void setgrent(void) { gr_next = 0; }
+void endgrent(void) { gr_next = 0; }
 
 int getpwent_r(struct passwd *pwd, char *buf, size_t buflen, struct passwd **result)
 {
@@ -276,4 +290,57 @@ int nftw(const char *path, nftw_fn fn, int fdlimit, int flags)
 {
     (void)fdlimit;
     return walk(path, fn, flags, 0);
+}
+
+/* ---- owners, times, temporary directories ---- */
+
+int lchown(const char *path, uid_t owner, gid_t group)
+{
+    (void)path; (void)owner; (void)group;
+    errno = ENOSYS;
+    return -1;
+}
+
+int lutimes(const char *path, const struct timeval tv[2])
+{
+    struct utimbuf ub;
+    if (!tv)
+        return utime(path, NULL);
+    ub.actime = tv[0].tv_sec;
+    ub.modtime = tv[1].tv_sec;
+    return utime(path, &ub);
+}
+
+char *mkdtemp(char *tmpl)
+{
+    static unsigned long seq;
+    static const char digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
+    size_t n = strlen(tmpl);
+    int tries, i;
+    if (n < 6 || strcmp(tmpl + n - 6, "XXXXXX") != 0)
+    {
+        errno = EINVAL;
+        return NULL;
+    }
+    for (tries = 0; tries < 100; tries++)
+    {
+        unsigned long v = (unsigned long)time(NULL) * 31UL + ++seq * 7919UL;
+        for (i = 0; i < 6; i++)
+        {
+            tmpl[n - 6 + i] = digits[v % 36];
+            v /= 36;
+        }
+        if (mkdir(tmpl, 0700) == 0)
+            return tmpl;
+        if (errno != EEXIST)
+            return NULL;
+    }
+    errno = EEXIST;
+    return NULL;
+}
+
+int pause(void)
+{
+    errno = ENOSYS;
+    return -1;
 }
