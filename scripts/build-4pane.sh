@@ -5,7 +5,7 @@
 # build tree is kept, so a build that runs out of time goes on next time
 # (BUDGET seconds of make per run). OUT gets 4Pane/: the program, its
 # dialogs (rc), pictures (bitmaps) and manual (doc).
-#   TOOLCHAIN=.../prefix WX_SDK=... WORK=build OUT=out scripts/build-4pane.sh
+#   TOOLCHAIN=.../prefix WX_SDK=... [FPUSPECS=fpuauto.specs FPULIB=dir] WORK=build OUT=out scripts/build-4pane.sh
 # Copyright (c) 2026 AmiCradle Team
 set -eu
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
@@ -80,7 +80,7 @@ if [ "$rc" = 124 ]; then echo "make ran out of time: run again to go on"; exit 0
 P="$OUT/4Pane"
 mkdir -p "$P"
 # shellcheck disable=SC2046
-m68k-amigaos-g++ -noixemul -m68040 -specs="$HERE/scripts/m68k-soft-m68040.specs" -o "$B/4Pane" $(cd "$B" && sed -n 's/^OBJS =//p' Makefile | sed "s|\([^ ]*\.o\)|$B/\1|g") \
+m68k-amigaos-g++ -noixemul -m68040 -specs="$HERE/scripts/m68k-soft-m68040.specs" ${FPUSPECS:+-specs="$FPUSPECS" -L"$FPULIB"} -o "$B/4Pane" $(cd "$B" && sed -n 's/^OBJS =//p' Makefile | sed "s|\([^ ]*\.o\)|$B/\1|g") \
     $("$W" --libs core,base,xml,html,adv,xrc) 2>&1 | grep -v 'duplicate section' | tail -40
 [ -f "$B/4Pane" ] || { echo "no link"; exit 1; }
 m68k-amigaos-strip -o "$P/4Pane" "$B/4Pane"
