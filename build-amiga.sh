@@ -6,13 +6,14 @@
 #   STOVE=.../stoves/os32-gcc16-open6 OUT=out ./build-amiga.sh
 #   (WXT_SRC=... to use a toolkit tree already on disk)
 # 4Pane is fetched at the version 4pane.lock gives; nothing third-party is
-# kept here. OUT gets 4Pane/ (the program and its files) when it links.
+# kept here. The build tree is kept outside the checkout (~/.cache), as a
+# Cradle job cleans the checkout first. OUT gets 4Pane/ (the program and its files) when it links.
 # Copyright (c) 2026 AmiCradle Team
 set -eu
 HERE=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
 . "$HERE/4pane.lock"
 STOVE=${STOVE:-"$HOME/AmiCradle/stoves/os32-gcc16-open6"}
-OUT="${OUT:-$HERE/build/out}"; WORK="${WORK:-$HERE/build}"; JOBS=${JOBS:-12}
+WORK="${WORK:-${XDG_CACHE_HOME:-$HOME/.cache}/gfamiga4pane/build}"; OUT="${OUT:-$WORK/out}"; JOBS=${JOBS:-12}
 TC="$STOVE/prefix"
 mkdir -p "$WORK/deps" "$OUT"
 t0=$(date +%s)
