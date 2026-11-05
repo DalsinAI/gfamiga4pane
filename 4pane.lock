@@ -1,0 +1,9 @@
+# What this port builds on: fetched at build time, never shipped.
+FP_VERSION=8.0
+FP_URL=https://downloads.sourceforge.net/project/fourpane/8.0/4pane-8.0.tar.gz
+FP_SHA256=0a5f9e08cd284a1edf0f93dc49a8a7faab86f9795c06116e167043b80ee0bafb
+# Our own pieces, fetched at these commits
+# GFOpenWX Toolkit with tool bars, XRC, the directory control, wizards and
+# HTML help (branch team3/4pane-toolkit-20261105)
+WXT_REPO=https://github.com/DalsinAI/gfopenwxtoolkit
+WXT_COMMIT=645445b409dfdcec371241861817a8a25861f15c

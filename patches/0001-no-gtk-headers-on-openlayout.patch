@@ -1,0 +1,13 @@
+diff --git a/MyTreeCtrl.cpp b/MyTreeCtrl.cpp
+index 735b6cf..aa750b3 100644
+--- a/MyTreeCtrl.cpp
++++ b/MyTreeCtrl.cpp
+@@ -236,7 +236,7 @@ selectedcolumn = filename;                  // // The next 2 should be set by co
+ reversesort = false;
+ }
+ 
+-#if !defined(__WXX11__) 
++#if !defined(__WXX11__) && !defined(__WXOPENLAYOUT__)
+   #if wxVERSION_NUMBER >= 2900 && !defined(__WXGTK20__) 
+     #include "wx/gtk1/dcclient.h"
+   #else
