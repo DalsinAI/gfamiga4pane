@@ -98,15 +98,11 @@ static int fill_group(struct group *grp, char *buf, size_t buflen, struct group 
     return 0;
 }
 
-/* the enumerations give the one entry, then NULL, then start again */
-static int pw_next, gr_next;
-
-/* libsocket's own would bring its getpwuid and getpwnam, which the
- * toolkit has already */
-void setpwent(void) { pw_next = 0; }
-void endpwent(void) { pw_next = 0; }
-void setgrent(void) { gr_next = 0; }
-void endgrent(void) { gr_next = 0; }
+/* the enumerations give the one entry, then NULL, then start again;
+ * set/end in amiga_pwent.c reset them */
+int amiga4pane_pw_next, amiga4pane_gr_next;
+#define pw_next amiga4pane_pw_next
+#define gr_next amiga4pane_gr_next
 
 int getpwent_r(struct passwd *pwd, char *buf, size_t buflen, struct passwd **result)
 {
