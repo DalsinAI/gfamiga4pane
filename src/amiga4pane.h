@@ -12,6 +12,11 @@
 #define GTK_CHECK_VERSION(major, minor, micro) 0
 #endif
 
+/* the toolkit's statvfs sets f_flag 1 for a write-protected volume */
+#ifndef ST_RDONLY
+#define ST_RDONLY 1
+#endif
+
 #include <sys/types.h>
 #include <pwd.h>
 #include <grp.h>
