@@ -1,6 +1,6 @@
 # GF Amiga 4Pane
 
-4Pane 8.0, the four-pane file manager, for AmigaOS 3 (68040), on the GFOpenWX Toolkit (wxWidgets on GFOpenLayout).
+4Pane 8.0, the four-pane file manager, for AmigaOS 3 (68040; the FPU when there is one, through fpuauto), on the GFOpenWX Toolkit (wxWidgets on GFOpenLayout).
 
 4Pane is fetched at build time at the version `4pane.lock` pins, and `patches/` is applied to it; nothing third-party is kept in this repository.
 

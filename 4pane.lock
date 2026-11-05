@@ -7,3 +7,6 @@ FP_SHA256=0a5f9e08cd284a1edf0f93dc49a8a7faab86f9795c06116e167043b80ee0bafb
 # HTML help (branch team3/4pane-toolkit-20261105)
 WXT_REPO=https://github.com/DalsinAI/gfopenwxtoolkit
 WXT_COMMIT=645445b409dfdcec371241861817a8a25861f15c
+# fpuauto (amicradle-guest common/fpuauto): the FPU when there is one
+FPUAUTO_REPO=https://github.com/DalsinAI/amicradle-guest
+FPUAUTO_COMMIT=4a784c84b878fe0e9abade7006e67e1ded9b165c
