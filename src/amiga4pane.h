@@ -27,6 +27,8 @@ int getpwuid_r(uid_t uid, struct passwd *pwd, char *buf, size_t buflen, struct p
 int getgrent_r(struct group *grp, char *buf, size_t buflen, struct group **result);
 int getgrnam_r(const char *name, struct group *grp, char *buf, size_t buflen, struct group **result);
 int getgrgid_r(gid_t gid, struct group *grp, char *buf, size_t buflen, struct group **result);
+/* no device files: fails with ENOSYS */
+int mknod(const char *path, mode_t mode, dev_t dev);
 #ifdef __cplusplus
 }
 #endif

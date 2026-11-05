@@ -6,6 +6,7 @@
  * - fstab and the mount table: no such files. They find nothing; the
  *   Amiga's volumes come from DOS.
  * - Pseudo-terminals: none, and no fork: forkpty fails with ENOSYS.
+ * - nftw: a walk with opendir and lstat; mknod: no device files (ENOSYS).
  *
  * Copyright (c) 2026 AmiCradle Team
  */
@@ -19,6 +20,10 @@
 #include "include/fstab.h"
 #include "include/mntent.h"
 #include "include/pty.h"
+#include "include/ftw.h"
+#include <stdlib.h>
+#include <dirent.h>
+#include <sys/stat.h>
 
 #define ONE_USER "user"
 #define ONE_GROUP "users"
@@ -186,4 +191,89 @@ int openpty(int *amaster, int *aslave, char *name, const struct termios *termp, 
     (void)amaster; (void)aslave; (void)name; (void)termp; (void)winp;
     errno = ENOSYS;
     return -1;
+}
+
+/* ---- device files: none ---- */
+
+int mknod(const char *path, mode_t mode, dev_t dev)
+{
+    (void)path; (void)mode; (void)dev;
+    errno = ENOSYS;
+    return -1;
+}
+
+/* ---- nftw ---- */
+
+typedef int (*nftw_fn)(const char *, const struct stat *, int, struct FTW *);
+
+/* where the last name in path starts */
+static int name_base(const char *path)
+{
+    int i, base = 0;
+    for (i = 0; path[i]; i++)
+        if ((path[i] == '/' || path[i] == ':') && path[i + 1])
+            base = i + 1;
+    return base;
+}
+
+static int walk(const char *path, nftw_fn fn, int flags, int level)
+{
+    struct stat st;
+    struct FTW ftw;
+    int type, r;
+    DIR *d;
+    struct dirent *e;
+
+    ftw.base = name_base(path);
+    ftw.level = level;
+    if (((flags & FTW_PHYS) ? lstat(path, &st) : stat(path, &st)) != 0)
+        return fn(path, NULL, FTW_NS, &ftw);
+    if (S_ISLNK(st.st_mode))
+        return fn(path, &st, FTW_SL, &ftw);
+    if (!S_ISDIR(st.st_mode))
+        return fn(path, &st, FTW_F, &ftw);
+
+    d = opendir(path);
+    type = d ? ((flags & FTW_DEPTH) ? FTW_DP : FTW_D) : FTW_DNR;
+    if (!(flags & FTW_DEPTH) || !d)
+    {
+        r = fn(path, &st, type, &ftw);
+        if (r || !d)
+        {
+            if (d)
+                closedir(d);
+            return r;
+        }
+    }
+    r = 0;
+    while (!r && (e = readdir(d)) != NULL)
+    {
+        size_t n = strlen(path);
+        char *child;
+        if (!strcmp(e->d_name, ".") || !strcmp(e->d_name, ".."))
+            continue;
+        child = malloc(n + strlen(e->d_name) + 2);
+        if (!child)
+        {
+            r = -1;
+            break;
+        }
+        /* "DH0:" and "Work/" take the name as it is; others a slash first */
+        memcpy(child, path, n);
+        if (n && path[n - 1] != ':' && path[n - 1] != '/')
+            child[n++] = '/';
+        strcpy(child + n, e->d_name);
+        r = walk(child, fn, flags, level + 1);
+        free(child);
+    }
+    closedir(d);
+    if (!r && (flags & FTW_DEPTH))
+        r = fn(path, &st, FTW_DP, &ftw);
+    return r;
+}
+
+int nftw(const char *path, nftw_fn fn, int fdlimit, int flags)
+{
+    (void)fdlimit;
+    return walk(path, fn, flags, 0);
 }
