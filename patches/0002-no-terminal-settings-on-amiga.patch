@@ -1,0 +1,18 @@
+diff --git a/Misc.cpp b/Misc.cpp
+index 8c3cd90..e64aee5 100644
+--- a/Misc.cpp
++++ b/Misc.cpp
+@@ -803,11 +803,13 @@ if (pid == -1)
+ if (pid == 0)                                   // The child process
+   { setsid();
+   
++#ifndef __AMIGA__  // no terminals here (and forkpty fails, so no child)
+     struct termios tos;                         // Turn off echo
+     tcgetattr(STDIN_FILENO, &tos);
+     tos.c_lflag &= ~(ECHO | ECHOE | ECHOK | ECHONL);
+     tos.c_oflag &= ~(ONLCR);
+     tcsetattr (STDIN_FILENO, TCSANOW, &tos);
++#endif
+ 
+     if (int ret =  execvp(*argv, argv) == -1) 
+       return CloseWithError(fd, wxString::Format(wxT("program exited with code %i\n"), ret));
