@@ -30,10 +30,27 @@ fetch() {   # name repo commit [paths...]: one commit, its tree (or those paths)
 }
 if [ -z "${WXT_SRC:-}" ]; then fetch gfopenwxtoolkit "$WXT_REPO" "$WXT_COMMIT"; WXT_SRC="$WORK/deps/gfopenwxtoolkit"; fi
 
-# the toolkit again only when its tree changed since its SDK was made
 WXB="$WORK/gfopenwx"
+# WX_SDK_JOB (4pane.lock): a Cradle job whose out/ has gfopenwx-sdk.tar.gz,
+# used instead of building the toolkit here
+if [ -n "${WX_SDK_JOB:-}" ]; then
+    TGZ=""
+    for d in "$HERE/../../jobs" "$HERE/../../../jobs"; do
+        [ -f "$d/$WX_SDK_JOB/out/gfopenwx-sdk.tar.gz" ] && { TGZ="$d/$WX_SDK_JOB/out/gfopenwx-sdk.tar.gz"; break; }
+    done
+    [ -n "$TGZ" ] || { echo "no gfopenwx-sdk.tar.gz from job $WX_SDK_JOB"; exit 1; }
+    if [ "$(cat "$WXB/out/.rev" 2>/dev/null)" != "job:$WX_SDK_JOB" ]; then
+        rm -rf "$WXB/out"; mkdir -p "$WXB/out"
+        tar xzf "$TGZ" -C "$WXB/out"
+        [ -x "$WXB/out/sdk/bin/wx-config" ] || { S=$(dirname "$(find "$WXB/out" -path '*/bin/wx-config' | head -1)"); [ -n "$S" ] && mv "$(dirname "$S")" "$WXB/out/sdk.tmp" && mv "$WXB/out/sdk.tmp" "$WXB/out/sdk"; }
+        [ -x "$WXB/out/sdk/bin/wx-config" ] || { echo "no wx-config in $TGZ"; exit 1; }
+        echo "job:$WX_SDK_JOB" > "$WXB/out/.rev"
+    fi
+    echo "toolkit SDK from job $WX_SDK_JOB"
+fi
+# the toolkit again only when its tree changed since its SDK was made
 WXREV=$( (git -C "$WXT_SRC" rev-parse HEAD 2>/dev/null; git -C "$WXT_SRC" diff HEAD 2>/dev/null) | sha256sum | cut -c1-16)
-if [ ! -x "$WXB/out/sdk/bin/wx-config" ] || [ "$(cat "$WXB/out/.rev" 2>/dev/null)" != "$WXREV" ]; then
+if [ -z "${WX_SDK_JOB:-}" ] && { [ ! -x "$WXB/out/sdk/bin/wx-config" ] || [ "$(cat "$WXB/out/.rev" 2>/dev/null)" != "$WXREV" ]; }; then
     # within this job's time; a run cut short goes on next time from its tree
     rc=0; STOVE="$STOVE" WORK="$WXB" OUT="$WXB/out" JOBS=$JOBS timeout -k 10 "${BUDGET_TOTAL:-840}" sh "$WXT_SRC/build-amiga.sh" > "$WORK.wx.log" 2>&1 || rc=$?
     if [ "$rc" = 124 ] || [ "$rc" = 137 ]; then
