@@ -39,6 +39,9 @@ if [ -n "${WX_SDK_JOB:-}" ]; then
         [ -f "$d/$WX_SDK_JOB/out/gfopenwx-sdk.tar.gz" ] && { TGZ="$d/$WX_SDK_JOB/out/gfopenwx-sdk.tar.gz"; break; }
     done
     [ -n "$TGZ" ] || { echo "no gfopenwx-sdk.tar.gz from job $WX_SDK_JOB"; exit 1; }
+    if [ -n "${WX_SDK_SHA256:-}" ]; then
+        [ "$(sha256sum "$TGZ" | cut -c1-64)" = "$WX_SDK_SHA256" ] || { echo "gfopenwx-sdk.tar.gz from job $WX_SDK_JOB does not match WX_SDK_SHA256"; exit 1; }
+    fi
     if [ "$(cat "$WXB/out/.rev" 2>/dev/null)" != "job:$WX_SDK_JOB" ]; then
         rm -rf "$WXB/out"; mkdir -p "$WXB/out"
         tar xzf "$TGZ" -C "$WXB/out"
