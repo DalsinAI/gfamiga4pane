@@ -33,7 +33,9 @@ if [ -z "${WXT_SRC:-}" ]; then fetch gfopenwxtoolkit "$WXT_REPO" "$WXT_COMMIT"; 
 WXB="$WORK/gfopenwx"
 # WX_SDK_JOB (4pane.lock): a Cradle job whose out/ has gfopenwx-sdk.tar.gz,
 # used instead of building the toolkit here
-if [ -n "${WX_SDK_JOB:-}" ]; then
+if [ -n "${WX_SDK_JOB:-}" ] && [ "$(cat "$WXB/out/.rev" 2>/dev/null)" = "job:$WX_SDK_JOB" ] && [ -x "$WXB/out/sdk/bin/wx-config" ]; then
+    echo "toolkit SDK from job $WX_SDK_JOB (already unpacked)"
+elif [ -n "${WX_SDK_JOB:-}" ]; then
     TGZ=""
     # the job folders sit beside Cradle's checkouts, a few levels up
     d="$HERE"
