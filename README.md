@@ -6,7 +6,9 @@
 
 ## Status
 
-Work in progress: the build is being brought up. Nothing runs yet.
+4Pane 8.0 runs on AmigaOS 3 (tested 6 Nov 2026 in a 68040 AmiCradle lab): the twin-pane trees and file lists, the toolbar, the XRC dialogs and the first-run wizard. Start it with a double-click on its icon, or from a Shell in its drawer. It needs gfopenpng.datatype for its PNG pictures.
+
+Not done yet: Amiga devices and mounting (4Pane's Linux device and mount code finds nothing here), terminal emulator and archive tools that call Unix programs.
 
 ## Building
 
@@ -14,7 +16,7 @@ Work in progress: the build is being brought up. Nothing runs yet.
 STOVE=~/AmiCradle/stoves/os32-gcc16-open6 OUT=out ./build-amiga.sh
 ```
 
-The first run fetches the GFOpenWX Toolkit at the commit `4pane.lock` pins and builds its SDK, then 4Pane for what is left of 840 s; run it again and it goes on from where it stopped. `out/4Pane/` gets the program with its dialogs (`rc/`), pictures (`bitmaps/`) and manual (`doc/`) when it links.
+The first run fetches the GFOpenWX Toolkit at the commit `4pane.lock` pins and builds its SDK, then 4Pane for what is left of 840 s; run it again and it goes on from where it stopped. `out/4Pane/` gets the program, its icon, its dialogs (`rc/`), pictures (`bitmaps/`) and manual (`doc/`) when it links, and `out/4Pane-8.0.lha` holds that drawer.
 
 | Where | What |
 |---|---|
