@@ -10,3 +10,7 @@ WXT_COMMIT=e42f0c032122dcfa12ca5f97be70a16e493a200f
 # fpuauto (amicradle-guest common/fpuauto): the FPU when there is one
 FPUAUTO_REPO=https://github.com/DalsinAI/amicradle-guest
 FPUAUTO_COMMIT=4a784c84b878fe0e9abade7006e67e1ded9b165c
+# Combined lab toolkit SDK (amicradle-guest team3/gfopenwx-lab-20261104 5359470):
+# own libraries 952e903, paths/threads 37db2f8, #6 e64c124, #7 340e3e5, file URLs e42f0c0
+WX_SDK_JOB=j20261106T134404-c36718
+WX_SDK_SHA256=68948c6f6941a69335c3116bd5efb490fbd2523c56991586ce9e742585cc68c9
