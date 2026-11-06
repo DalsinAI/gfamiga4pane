@@ -35,10 +35,19 @@ WXB="$WORK/gfopenwx"
 # used instead of building the toolkit here
 if [ -n "${WX_SDK_JOB:-}" ]; then
     TGZ=""
-    for d in "$HERE/../../jobs" "$HERE/../../../jobs"; do
-        [ -f "$d/$WX_SDK_JOB/out/gfopenwx-sdk.tar.gz" ] && { TGZ="$d/$WX_SDK_JOB/out/gfopenwx-sdk.tar.gz"; break; }
+    # the job folders sit beside Cradle's checkouts, a few levels up
+    d="$HERE"
+    for i in 1 2 3 4 5; do
+        d=$(dirname "$d")
+        for j in "$d/jobs" "$d/cradle-builds/jobs" "$d/cradle-jobs"; do
+            [ -f "$j/$WX_SDK_JOB/out/gfopenwx-sdk.tar.gz" ] && { TGZ="$j/$WX_SDK_JOB/out/gfopenwx-sdk.tar.gz"; break 2; }
+        done
     done
-    [ -n "$TGZ" ] || { echo "no gfopenwx-sdk.tar.gz from job $WX_SDK_JOB"; exit 1; }
+    if [ -z "$TGZ" ]; then
+        TGZ=$(find "$(dirname "$(dirname "$(dirname "$HERE")")")" -maxdepth 6 -path "*/$WX_SDK_JOB/out/gfopenwx-sdk.tar.gz" 2>/dev/null | head -1)
+    fi
+    [ -n "$TGZ" ] || { echo "no gfopenwx-sdk.tar.gz from job $WX_SDK_JOB (looked up from $HERE)"; find "$(dirname "$(dirname "$HERE")")" -maxdepth 3 -type d -name "$WX_SDK_JOB" 2>/dev/null | head; exit 1; }
+    echo "SDK: $TGZ"
     if [ -n "${WX_SDK_SHA256:-}" ]; then
         [ "$(sha256sum "$TGZ" | cut -c1-64)" = "$WX_SDK_SHA256" ] || { echo "gfopenwx-sdk.tar.gz from job $WX_SDK_JOB does not match WX_SDK_SHA256"; exit 1; }
     fi
