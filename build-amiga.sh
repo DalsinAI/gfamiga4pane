@@ -34,7 +34,15 @@ if [ -z "${WXT_SRC:-}" ]; then fetch gfopenwxtoolkit "$WXT_REPO" "$WXT_COMMIT"; 
 WXB="$WORK/gfopenwx"
 WXREV=$( (git -C "$WXT_SRC" rev-parse HEAD 2>/dev/null; git -C "$WXT_SRC" diff HEAD 2>/dev/null) | sha256sum | cut -c1-16)
 if [ ! -x "$WXB/out/sdk/bin/wx-config" ] || [ "$(cat "$WXB/out/.rev" 2>/dev/null)" != "$WXREV" ]; then
-    STOVE="$STOVE" WORK="$WXB" OUT="$WXB/out" JOBS=$JOBS sh "$WXT_SRC/build-amiga.sh" > "$WORK.wx.log" 2>&1 || { tail -40 "$WORK.wx.log"; exit 1; }
+    # within this job's time; a run cut short goes on next time from its tree
+    rc=0; STOVE="$STOVE" WORK="$WXB" OUT="$WXB/out" JOBS=$JOBS timeout -k 10 "${BUDGET_TOTAL:-840}" sh "$WXT_SRC/build-amiga.sh" > "$WORK.wx.log" 2>&1 || rc=$?
+    if [ "$rc" = 124 ] || [ "$rc" = 137 ]; then
+        echo "toolkit not finished in this run ($(( $(date +%s) - t0 )) s); where it got to:"
+        for f in "$WXB/base/make.log" "$WXB/gui/make.log" "$WORK.wx.log"; do [ -f "$f" ] && { echo "== $f"; tail -5 "$f"; }; done
+        ls "$WXB/gui/obj" 2>/dev/null | wc -l | sed 's/^/gui objects: /'
+        exit 0
+    fi
+    [ "$rc" = 0 ] || { tail -40 "$WORK.wx.log"; exit 1; }
     [ -x "$WXB/out/sdk/bin/wx-config" ] || { tail -40 "$WORK.wx.log"; echo "no toolkit SDK"; exit 1; }
     echo "$WXREV" > "$WXB/out/.rev"
     echo "toolkit: $(( $(date +%s) - t0 )) s"
