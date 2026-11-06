@@ -86,4 +86,18 @@ m68k-amigaos-g++ -noixemul -m68040 -specs="$HERE/scripts/m68k-soft-m68040.specs"
 m68k-amigaos-strip -o "$P/4Pane" "$B/4Pane"
 rm -rf "$P/rc" "$P/bitmaps" "$P/doc"
 cp -a "$SRC/rc" "$SRC/bitmaps" "$SRC/doc" "$P/"
+python3 -I "$HERE/scripts/make-icon.py" "$P/4Pane.info"
 ls -l "$P/4Pane"
+
+# the package: 4Pane-<version>.lha holding the 4Pane drawer
+rm -rf "$WORK/pkg"; mkdir -p "$WORK/pkg"
+cp -a "$P" "$WORK/pkg/"
+cp "$HERE/README.md" "$WORK/pkg/4Pane/ReadMe.txt"
+rm -f "$OUT/4Pane-$FP_VERSION.lha"
+if command -v lha >/dev/null 2>&1; then
+    (cd "$WORK/pkg" && lha -aq "$OUT/4Pane-$FP_VERSION.lha" 4Pane >/dev/null) && ls -l "$OUT/4Pane-$FP_VERSION.lha"
+elif command -v jlha >/dev/null 2>&1; then
+    (cd "$WORK/pkg" && jlha -aq "$OUT/4Pane-$FP_VERSION.lha" 4Pane >/dev/null) && ls -l "$OUT/4Pane-$FP_VERSION.lha"
+else
+    echo "no lha here: no package"
+fi
