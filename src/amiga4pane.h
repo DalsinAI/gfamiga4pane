@@ -17,6 +17,13 @@
 #define ST_RDONLY 1
 #endif
 
+/* 4Pane joins its folders (which end in "/") with names that start with "/".
+ * Unix reads "dir//name" as "dir/name", but on the Amiga "//" is the parent
+ * folder, so drop one of the two slashes (patch 0004). */
+#define AMIGA_PATHJOIN(dir, rest) \
+    ((dir).EndsWith(wxT("/")) || (dir).EndsWith(wxT(":")) \
+        ? (dir) + wxString(rest).Mid(1) : (dir) + wxString(rest))
+
 #include <sys/types.h>
 #include <pwd.h>
 #include <grp.h>
