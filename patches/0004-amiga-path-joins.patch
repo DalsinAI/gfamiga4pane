@@ -1,0 +1,119 @@
+diff -ru a/Devices.cpp b/Devices.cpp
+--- a/Devices.cpp	2026-11-06 21:24:01.576476301 +0000
++++ b/Devices.cpp	2026-11-06 21:24:01.613159511 +0000
+@@ -2855,7 +2855,7 @@
+ {
+ static int BitmapsAvailable = -1;
+ if (BitmapsAvailable == -1)
+-  { BitmapsAvailable = wxFileExists(BITMAPSDIR + "/mtp.png"); if (!BitmapsAvailable) wxLogDebug("gvfs icons not available: probably using a stale BITMAPSDIR"); }
++  { BitmapsAvailable = wxFileExists(AMIGA_PATHJOIN(BITMAPSDIR, "/mtp.png")); if (!BitmapsAvailable) wxLogDebug("gvfs icons not available: probably using a stale BITMAPSDIR"); }
+ if (!BitmapsAvailable) return;
+ 
+ static size_t UserID = getuid();
+diff -ru a/Dup.cpp b/Dup.cpp
+--- a/Dup.cpp	2026-11-06 21:24:01.579939386 +0000
++++ b/Dup.cpp	2026-11-06 21:24:01.614238673 +0000
+@@ -925,7 +925,7 @@
+ 
+ void MultipleRenameDlg::OnRegexCrib(wxCommandEvent& event)
+ {
+-HtmlDialog(_("RegEx Help"), HELPDIR + wxT("/RegExpHelp.htm"), wxT("RegExpHelp"), this);
++HtmlDialog(_("RegEx Help"), AMIGA_PATHJOIN(HELPDIR, wxT("/RegExpHelp.htm")), wxT("RegExpHelp"), this);
+ }
+ 
+ void MultipleRenameDlg::OnSpinUp(wxSpinEvent& WXUNUSED(event))
+diff -ru a/MyDirs.cpp b/MyDirs.cpp
+--- a/MyDirs.cpp	2026-11-06 21:24:01.583656626 +0000
++++ b/MyDirs.cpp	2026-11-06 21:24:01.614526940 +0000
+@@ -487,15 +487,15 @@
+ wxBitmap toolBarBitmaps[2];
+ toolBarBitmaps[0] = wxBitmap(fulltree_xpm);                 // First the "standard" buttons
+ toolBarBitmaps[1] = GetBestBitmap(wxART_GO_UP, wxART_MENU, wxBitmap(up_xpm));
+-wxBitmapButton* backbtn = new wxBitmapButton(toolBar, XRCID("IDM_TOOLBAR_back"), GetBestBitmap(wxART_GO_BACK, wxART_MENU, wxBitmap(BITMAPSDIR + wxT("/back.xpm"))),
++wxBitmapButton* backbtn = new wxBitmapButton(toolBar, XRCID("IDM_TOOLBAR_back"), GetBestBitmap(wxART_GO_BACK, wxART_MENU, wxBitmap(AMIGA_PATHJOIN(BITMAPSDIR, wxT("/back.xpm")))),
+                                                   wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW | wxNO_BORDER);
+ backbtn->SetToolTip(_("Back to previous directory"));
+-wxBitmapButton* forwardbtn = new wxBitmapButton(toolBar, XRCID("IDM_TOOLBAR_forward"), GetBestBitmap(wxART_GO_FORWARD, wxART_MENU, wxBitmap(BITMAPSDIR + wxT("/forward.xpm"))),
++wxBitmapButton* forwardbtn = new wxBitmapButton(toolBar, XRCID("IDM_TOOLBAR_forward"), GetBestBitmap(wxART_GO_FORWARD, wxART_MENU, wxBitmap(AMIGA_PATHJOIN(BITMAPSDIR, wxT("/forward.xpm")))),
+                                                   wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW | wxNO_BORDER);
+ forwardbtn->SetToolTip(_("Re-enter directory"));
+ 
+-MenuOpenButton1 = new MyDropdownButton(toolBar, XRCID("IDM_TOOLBAR_smalldropdown1"), wxBitmap(BITMAPSDIR + wxT("/smalldropdown.png"), wxBITMAP_TYPE_PNG));
+-MenuOpenButton2 = new MyDropdownButton(toolBar, XRCID("IDM_TOOLBAR_smalldropdown2"), wxBitmap(BITMAPSDIR + wxT("/smalldropdown.png"), wxBITMAP_TYPE_PNG));
++MenuOpenButton1 = new MyDropdownButton(toolBar, XRCID("IDM_TOOLBAR_smalldropdown1"), wxBitmap(AMIGA_PATHJOIN(BITMAPSDIR, wxT("/smalldropdown.png")), wxBITMAP_TYPE_PNG));
++MenuOpenButton2 = new MyDropdownButton(toolBar, XRCID("IDM_TOOLBAR_smalldropdown2"), wxBitmap(AMIGA_PATHJOIN(BITMAPSDIR, wxT("/smalldropdown.png")), wxBITMAP_TYPE_PNG));
+ MenuOpenButton1->SetToolTip(_("Select previously-visited directory"));
+ MenuOpenButton2->SetToolTip(_("Select previously-visited directory"));
+ int width, height; backbtn->GetClientSize(&width, &height);
+diff -ru a/MyFrame.cpp b/MyFrame.cpp
+--- a/MyFrame.cpp	2026-11-06 21:24:01.586924480 +0000
++++ b/MyFrame.cpp	2026-11-06 21:24:01.615247207 +0000
+@@ -165,7 +165,7 @@
+ 
+               // 1.0 added some extra bitmaps; again try to detect any stale configs
+   { wxLogNull shh;
+-    if (!wxFileExists(BITMAPSDIR + wxT("/NewTab.png")))
++    if (!wxFileExists(AMIGA_PATHJOIN(BITMAPSDIR, wxT("/NewTab.png"))))
+       { wxString errormsg(wxT("An error occured when trying to load a bitmap.\nThat is probably because there are old configuration files on your computer.\
+           \nI suggest you check your installation, and perhaps delete the file ~/.4Pane\nDo you want to try to continue anyway?"));
+         if (wxMessageBox(errormsg, _("Warning!"),wxICON_ERROR|wxYES_NO) != wxYES) return false;
+@@ -593,7 +593,7 @@
+     if (Help->Initialize(HELPDIR))
+        { wxLogError(_("Cannot initialize the help system; aborting.")); return; }
+ 
+-    Help->AddBook(wxFileName(HELPDIR + wxT("/Chapt.hhp")));
++    Help->AddBook(wxFileName(AMIGA_PATHJOIN(HELPDIR, wxT("/Chapt.hhp"))));
+   }
+ 
+ MyBitmapButton::SetUnknownButtonNo();  // Locate the iconno of unknown.xpm, to use if an icon is missing
+@@ -728,15 +728,15 @@
+ toolBarBitmaps[2] = GetBestBitmap(wxART_PASTE, wxART_TOOLBAR, wxBitmap(paste));
+ toolBarBitmaps[3] = GetBestBitmap(wxART_UNDO,  wxART_TOOLBAR, wxBitmap(undo));
+ toolBarBitmaps[4] = GetBestBitmap(wxART_REDO,  wxART_TOOLBAR, wxBitmap(redo));
+-toolBarBitmaps[5] = wxBitmap(BITMAPSDIR + wxT("/NewTab.png"), wxBITMAP_TYPE_PNG); // There aren't any official stock alternatives to these
+-toolBarBitmaps[6] = wxBitmap(BITMAPSDIR + wxT("/DelTab.png"), wxBITMAP_TYPE_PNG);
+-toolBarBitmaps[7] = wxBitmap(BITMAPSDIR + wxT("/Preview.png"), wxBITMAP_TYPE_PNG);
++toolBarBitmaps[5] = wxBitmap(AMIGA_PATHJOIN(BITMAPSDIR, wxT("/NewTab.png")), wxBITMAP_TYPE_PNG); // There aren't any official stock alternatives to these
++toolBarBitmaps[6] = wxBitmap(AMIGA_PATHJOIN(BITMAPSDIR, wxT("/DelTab.png")), wxBITMAP_TYPE_PNG);
++toolBarBitmaps[7] = wxBitmap(AMIGA_PATHJOIN(BITMAPSDIR, wxT("/Preview.png")), wxBITMAP_TYPE_PNG);
+ 
+ int count=0, separator=0;                                              // Use these to count the no of buttons etc loaded before the ones with sidebars
+     
+-largesidebar1 = new wxBitmapButton(toolbar, XRCID("IDM_TOOLBAR_LargeDropdown1"), wxBitmap(BITMAPSDIR + wxT("/largedropdown.png"), wxBITMAP_TYPE_PNG),
++largesidebar1 = new wxBitmapButton(toolbar, XRCID("IDM_TOOLBAR_LargeDropdown1"), wxBitmap(AMIGA_PATHJOIN(BITMAPSDIR, wxT("/largedropdown.png")), wxBITMAP_TYPE_PNG),
+                                                   wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW | wxNO_BORDER);
+-largesidebar2 = new wxBitmapButton(toolbar, XRCID("IDM_TOOLBAR_LargeDropdown2"), wxBitmap(BITMAPSDIR + wxT("/largedropdown.png"), wxBITMAP_TYPE_PNG),
++largesidebar2 = new wxBitmapButton(toolbar, XRCID("IDM_TOOLBAR_LargeDropdown2"), wxBitmap(AMIGA_PATHJOIN(BITMAPSDIR, wxT("/largedropdown.png")), wxBITMAP_TYPE_PNG),
+                                                   wxDefaultPosition, wxDefaultSize, wxBU_AUTODRAW | wxNO_BORDER);
+ largesidebar1->SetToolTip(_("Undo several actions at once"));
+ largesidebar2->SetToolTip(_("Redo several actions at once"));
+@@ -1044,7 +1044,7 @@
+ void MyFrame::OnHelpAbout(wxCommandEvent& WXUNUSED(event))
+ {
+ if (HELPDIR.IsEmpty()) return;
+-HtmlDialog(_("About"), HELPDIR + wxT("/About.htm"), wxT("AboutDlg"), this, wxSize(300, 300));
++HtmlDialog(_("About"), AMIGA_PATHJOIN(HELPDIR, wxT("/About.htm")), wxT("AboutDlg"), this, wxSize(300, 300));
+ }
+ 
+ void MyFrame::OnSaveTabs(wxCommandEvent& WXUNUSED(event))
+diff -ru a/Tools.cpp b/Tools.cpp
+--- a/Tools.cpp	2026-11-06 21:24:01.590665384 +0000
++++ b/Tools.cpp	2026-11-06 21:24:01.615930241 +0000
+@@ -1837,7 +1837,7 @@
+ void MyGrepNotebook::OnRegexCrib(wxCommandEvent& event)
+ {
+ if (HELPDIR.IsEmpty()) return;
+-HtmlDialog(_("RegEx Help"), HELPDIR + wxT("/RegExpHelp.htm"), wxT("RegExpHelp"), GetPage(GetSelection()));
++HtmlDialog(_("RegEx Help"), AMIGA_PATHJOIN(HELPDIR, wxT("/RegExpHelp.htm")), wxT("RegExpHelp"), GetPage(GetSelection()));
+ }
+ 
+ BEGIN_EVENT_TABLE(MyGrepNotebook, wxNotebook)
+@@ -2164,7 +2164,7 @@
+ int id = event.GetId();
+ 
+ if (id == XRCID("RegexCrib"))
+-  { if (!HELPDIR.IsEmpty())  HtmlDialog(_("RegEx Help"), HELPDIR + wxT("/RegExpHelp.htm"), wxT("RegExpHelp"), this); return; }
++  { if (!HELPDIR.IsEmpty())  HtmlDialog(_("RegEx Help"), AMIGA_PATHJOIN(HELPDIR, wxT("/RegExpHelp.htm")), wxT("RegExpHelp"), this); return; }
+ 
+ bool dir_recurse = false;
+ if (id == XRCID("wxID_OK"))
