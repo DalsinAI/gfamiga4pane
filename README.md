@@ -47,6 +47,8 @@ ADDRESS '4PANE.1'
 SAY result
 ```
 
+`Rexx/Here.rexx` (in the package's Rexx drawer) is an example.
+
 ## Licence
 
 4Pane is GPL v3 (some parts wxWindows Licence); the patches and build files here are GPL v3.
