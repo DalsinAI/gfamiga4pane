@@ -1,0 +1,71 @@
+AmigaOS: the ARexx port 4PANE.1 opens with the main window (src/amiga_rexx.cpp).
+
+--- a/MyFrame.cpp	2026-11-07 13:52:55.415078150 +0000
++++ b/MyFrame.cpp	2026-11-07 13:52:55.443486198 +0000
+@@ -58,25 +58,25 @@
+   wxDEFINE_EVENT(myEVT_BriefMessageBox, wxCommandEvent);
+ #endif
+ 
+-static void WaitForDebugger(int signo) 
+-{
+-wxString msg;
+-msg << wxT("4Pane crashed :(  You may try to find out why using gdb\n")
+-  << wxT("or let it crash silently..\n")
+-  << wxT("Investigate using gdb?\n");
+-  
+-int rc = wxMessageBox(msg, wxT("4Pane Crash Handler"), wxYES_NO|wxCENTER|wxICON_ERROR);
++static void WaitForDebugger(int signo) 
++{
++wxString msg;
++msg << wxT("4Pane crashed :(  You may try to find out why using gdb\n")
++  << wxT("or let it crash silently..\n")
++  << wxT("Investigate using gdb?\n");
++  
++int rc = wxMessageBox(msg, wxT("4Pane Crash Handler"), wxYES_NO|wxCENTER|wxICON_ERROR);
+ if (rc == wxYES)
+-  { // Launch a shell command with the command: gdb -p <PID>
+-    char command[256]; memset (command, 0, sizeof(command));
+-    sprintf(command, "xterm -T 'gdb' -e 'gdb -p %d'", getpid());
++  { // Launch a shell command with the command: gdb -p <PID>
++    char command[256]; memset (command, 0, sizeof(command));
++    sprintf(command, "xterm -T 'gdb' -e 'gdb -p %d'", getpid());
+     if(system (command) == 0)
+-      { signal(signo, SIG_DFL); raise(signo); }
++      { signal(signo, SIG_DFL); raise(signo); }
+      else 
+-      { // Go down without launching the debugger, ask the user to do it manually
+-        wxMessageBox(wxString::Format(wxT("Failed to launch the debugger\nIf gdb is installed, you may still run it manually by typing this command in a terminal:\ngdb -p %d"), getpid()), wxT("CodeLite Crash Handler"), wxOK|wxCENTER|wxICON_ERROR);
+-        pause();
+-      }
++      { // Go down without launching the debugger, ask the user to do it manually
++        wxMessageBox(wxString::Format(wxT("Failed to launch the debugger\nIf gdb is installed, you may still run it manually by typing this command in a terminal:\ngdb -p %d"), getpid()), wxT("CodeLite Crash Handler"), wxOK|wxCENTER|wxICON_ERROR);
++        pause();
++      }
+   }
+ 
+ signal(signo, SIG_DFL); raise(signo);
+@@ -109,10 +109,10 @@
+ #endif
+ 
+ bool MyApp::OnInit()
+-{
+-  // Install signal handlers
+-signal(SIGSEGV, WaitForDebugger);
+-signal(SIGABRT, WaitForDebugger);
++{
++  // Install signal handlers
++signal(SIGSEGV, WaitForDebugger);
++signal(SIGABRT, WaitForDebugger);
+ 
+ m_EscapeCode = m_EscapeFlags = 0;
+ 
+@@ -218,6 +218,9 @@
+ long width = wxConfigBase::Get()->Read(wxT("/Misc/AppWidth"), 600l);
+ 
+ frame = new MyFrame(wxSize(width, height));
++#ifdef __AMIGA__
++{ extern void AmigaRexxStart(MyFrame* f); AmigaRexxStart(frame); }  // src/amiga_rexx.cpp: the ARexx port 4PANE.1
++#endif
+ wxString title = GetAppName();                      // In case this isn't the normal one
+ if (getuid() == 0) title += wxT(" (superuser)");    // It's nice to know if we're root
+ frame->SetTitle(title);
