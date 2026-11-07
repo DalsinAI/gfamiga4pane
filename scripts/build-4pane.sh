@@ -39,7 +39,7 @@ W="$WX_SDK/bin/wx-config"
 LATE=""
 if m68k-amigaos-gcc -fno-late-combine-instructions -S -o /dev/null -x c /dev/null 2>/dev/null; then LATE="-fno-late-combine-instructions"; fi
 CF="-noixemul -m68040 -O2 $LATE"
-DEFS="-DNO_LZMA_ARCHIVE_STREAMS -DNDEBUG"
+DEFS="-DNO_LZMA_ARCHIVE_STREAMS -DNDEBUG -DFP_VERSION_STR=\\\"$FP_VERSION\\\""
 
 # 4Pane's sources (Makefile.am's list) and the port's own (src/)
 CXXSRC="Accelerators Archive ArchiveStream Bookmarks Configure Devices Dup ExecuteInDialog Filetypes Misc Mounts MyDirs MyDragImage MyFiles MyFrame MyGenericDirCtrl MyNotebook MyTreeCtrl Otherstreams Redo Tools bzipstream"
