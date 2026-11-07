@@ -93,6 +93,7 @@ ls -l "$P/4Pane"
 rm -rf "$WORK/pkg"; mkdir -p "$WORK/pkg"
 cp -a "$P" "$WORK/pkg/"
 cp "$HERE/README.md" "$WORK/pkg/4Pane/ReadMe.txt"
+mkdir -p "$WORK/pkg/4Pane/Rexx"; cp "$HERE"/Rexx/*.rexx "$WORK/pkg/4Pane/Rexx/"   # the ARexx example (README: ARexx)
 rm -f "$OUT/4Pane-$FP_VERSION.lha"
 if command -v lha >/dev/null 2>&1; then
     (cd "$WORK/pkg" && lha -aq "$OUT/4Pane-$FP_VERSION.lha" 4Pane >/dev/null) && ls -l "$OUT/4Pane-$FP_VERSION.lha"
