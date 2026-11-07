@@ -1,0 +1,17 @@
+diff --git a/ArchiveStream.cpp b/ArchiveStream.cpp
+index 4aa3f04..355a046 100644
+--- a/ArchiveStream.cpp
++++ b/ArchiveStream.cpp
+@@ -963,7 +963,12 @@ return true; // Otherwise the user presumably pressed Cancel, but still return t
+ //---------------------------------------------------------------------------------
+ wxDEFINE_SCOPED_PTR(wxInputStream, wxInputStreamPtr)
+ wxDEFINE_SCOPED_PTR(wxOutputStream, wxOutputStreamPtr)
++#ifdef __AMIGA__
++// wx's static library defines wxTarEntryPtr too (src/common/tarstrm.cpp): this file's own
++namespace { wxDEFINE_SCOPED_PTR_TYPE(wxTarEntry); }
++#else
+ wxDEFINE_SCOPED_PTR_TYPE(wxTarEntry);
++#endif
+ wxDEFINE_SCOPED_PTR_TYPE(wxZipEntry);
+ 
+ ZipArchiveStream::ZipArchiveStream(DataBase* archive)  :  ArchiveStream(archive)  // Opens a 'real' archive, not a nested one

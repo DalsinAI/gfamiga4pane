@@ -1,0 +1,29 @@
+AmigaOS: a plain main() with a 1 MB stack that also takes a Workbench start.
+
+--- a/MyFrame.cpp
++++ b/MyFrame.cpp
+@@ -89,7 +89,24 @@
+ 
+ enum helpcontext HelpContext = HCunknown;          // What Help to show on F1
+ 
++#ifdef __AMIGA__
++// AmigaOS: a plain main(). libnix's start-up gives the program the stack
++// __stack asks for, so a double-click on its icon or a Shell with a small
++// stack runs it. Started from Workbench, argc is 0 and argv the WBStartup
++// message: wx gets the program's name alone.
++wxIMPLEMENT_APP_NO_MAIN(MyApp);
++extern "C" { unsigned long __stack = 1048576; }
++
++int main(int argc, char *argv[])
++{
++  static char name[] = "4Pane";
++  static char *wbargv[] = { name, NULL };
++  if (argc == 0) { argc = 1; argv = wbargv; }
++  return wxEntry(argc, argv);
++}
++#else
+ IMPLEMENT_APP(MyApp)
++#endif
+ 
+ bool MyApp::OnInit()
+ {
