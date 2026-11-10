@@ -1,0 +1,13 @@
+AmigaOS: 4Pane ends when it quits. MyApp::OnExit deletes m_liblzma, which only the liblzma probe in OnInit sets; built with NO_LZMA_ARCHIVE_STREAMS (as here) it was never set, so OnExit deleted a stray pointer and the program crashed on its way out (QUIT returned RC 0, the window went, the process stayed). It now starts out NULL.
+
+--- a/MyFrame.h
++++ b/MyFrame.h
+@@ -63,7 +63,7 @@
+ class MyApp : public wxApp
+ {
+ public:
+-MyApp() : wxApp(), frame(NULL), m_WaylandSession(false) {}
++MyApp() : wxApp(), frame(NULL), m_WaylandSession(false) { m_liblzma = NULL; } // AmigaOS: OnExit deletes it, and NO_LZMA_ARCHIVE_STREAMS builds never set it
+ void RestartApplic();
+ 
+ const wxColour* GetBackgroundColourUnSelected() const { return &m_BackgroundColourUnSelected; }
