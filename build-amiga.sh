@@ -94,6 +94,13 @@ fi
 
 left=$(( ${BUDGET_TOTAL:-840} - ($(date +%s) - t0) ))
 [ "$left" -gt 60 ] || { echo "no time left for 4Pane this run"; exit 0; }
+# objects made against another toolkit commit go (ARexx rule 7): its
+# headers are not in the make rules, and stale objects crash at start
+# (gfamigagolly #3)
+if [ "$(cat "$WORK/.toolkit-objs" 2>/dev/null)" != "$WXT_COMMIT" ]; then
+    rm -rf "$WORK/obj"
+    echo "$WXT_COMMIT" > "$WORK/.toolkit-objs"
+fi
 TOOLCHAIN="$TC" WORK="$WORK" OUT="$OUT" JOBS=$JOBS WX_SDK="$WXB/out/sdk" BUDGET=$left \
     FPUSPECS="$FA/fpuauto.specs" FPULIB="$FAL" \
     sh "$HERE/scripts/build-4pane.sh"
