@@ -24,6 +24,33 @@ The first run fetches the GFOpenWX Toolkit at the commit `4pane.lock` pins and b
 | `src/` | the port's own pieces |
 | `scripts/` | the 4Pane build and the link specs |
 
+## ARexx
+
+4Pane has an ARexx port, `4PANE.1` (`4PANE.2` for a second copy), from the GFOpenWX Toolkit's `wxARexxPort` on arexx.class (`src/amiga_rexx.cpp`, patch 0006).
+
+| Command | Does |
+| --- | --- |
+| `GOTO PATH/A` | the active pane shows PATH (a drawer, or a file's drawer with the file selected) |
+| `GETPATH` | RESULT: the active pane's selected path |
+| `GETSELECTED` | RESULT: every selected path in the active pane, each in double quotes |
+| `REFRESH` | the active pane reads its drawer again |
+| `QUIT`, `ACTIVATE`, `DEACTIVATE`, `VERSION`, `HELP`, `FAULT` | the toolkit's standard commands |
+
+RC 10 when there is no active pane.
+
+```
+/* 4Pane: show Work:Projects, then say what is selected */
+OPTIONS RESULTS
+ADDRESS '4PANE.1'
+'GOTO Work:Projects'
+'GETSELECTED'
+SAY result
+```
+
+`Rexx/Here.rexx` (in the package's Rexx drawer) is an example. `tests/arexx.rexx` (in the tests drawer beside it) checks the whole port: `rx tests/arexx.rexx` with the program running; it QUITs the program at the end.
+
+Return codes, as OS 3.2's arexx.class: 0 OK, 5 warning, 10 error, 20 unknown command or failure.
+
 ## Licence
 
 4Pane is GPL v3 (some parts wxWindows Licence); the patches and build files here are GPL v3.

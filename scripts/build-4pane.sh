@@ -39,7 +39,7 @@ W="$WX_SDK/bin/wx-config"
 LATE=""
 if m68k-amigaos-gcc -fno-late-combine-instructions -S -o /dev/null -x c /dev/null 2>/dev/null; then LATE="-fno-late-combine-instructions"; fi
 CF="-noixemul -m68040 -O2 $LATE"
-DEFS="-DNO_LZMA_ARCHIVE_STREAMS -DNDEBUG"
+DEFS="-DNO_LZMA_ARCHIVE_STREAMS -DNDEBUG -DFP_VERSION_STR=\\\"$FP_VERSION\\\""
 
 # 4Pane's sources (Makefile.am's list) and the port's own (src/)
 CXXSRC="Accelerators Archive ArchiveStream Bookmarks Configure Devices Dup ExecuteInDialog Filetypes Misc Mounts MyDirs MyDragImage MyFiles MyFrame MyGenericDirCtrl MyNotebook MyTreeCtrl Otherstreams Redo Tools bzipstream"
@@ -93,6 +93,8 @@ ls -l "$P/4Pane"
 rm -rf "$WORK/pkg"; mkdir -p "$WORK/pkg"
 cp -a "$P" "$WORK/pkg/"
 cp "$HERE/README.md" "$WORK/pkg/4Pane/ReadMe.txt"
+mkdir -p "$WORK/pkg/4Pane/Rexx"; cp "$HERE"/Rexx/*.rexx "$WORK/pkg/4Pane/Rexx/"   # the ARexx example (README: ARexx)
+mkdir -p "$WORK/pkg/4Pane/tests"; cp "$HERE/tests/arexx.rexx" "$WORK/pkg/4Pane/tests/"   # the ARexx port test
 rm -f "$OUT/4Pane-$FP_VERSION.lha"
 if command -v lha >/dev/null 2>&1; then
     (cd "$WORK/pkg" && lha -aq "$OUT/4Pane-$FP_VERSION.lha" 4Pane >/dev/null) && ls -l "$OUT/4Pane-$FP_VERSION.lha"
