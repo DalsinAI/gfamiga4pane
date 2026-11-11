@@ -1,0 +1,38 @@
+AmigaOS: 4Pane quits without an error, and deletes folders for good. Both ReallyDelete()s (the one that empties 4Pane's own Trash folders at exit, and the one behind deleting a folder for good) deleted the folder while their wxDir still had it open. On AmigaOS an open wxDir holds a lock on the folder, and a locked folder can't be deleted (ERROR_OBJECT_IN_USE, which the C library gives as errno 26, Text file busy). At exit this showed a requester, 'Directory SYS:Prefs/Env-Archive/.cache/4Pane/.Trash/Tempfiles couldn't be deleted (error 26: Text file busy)', and 4Pane stayed until OK was pressed; the Trash folders were never emptied. The wxDir now goes before Rmdir().
+
+--- a/MyDirs.cpp
++++ b/MyDirs.cpp
+@@ -1574,6 +1574,7 @@
+   }
+ 
+                                   // If we're here, it's a dir
++{                                                             // AmigaOS: wxDir holds a lock on the dir, and a locked dir can't be deleted, so it goes before Rmdir()
+ wxDir dir(PathName->GetPath());                               // Use helper class to deal sequentially with each child file & subdir
+ if (!dir.IsOpened()) return false;
+ 
+@@ -1583,6 +1584,7 @@
+     if (!ReallyDelete(&child))                                // Slaughter it by recursion, whether it's a dir or file
+       return false;                                           // If this fails, bug out
+   }
++}
+   
+ if (!PathName->Rmdir())                                       // Finally, kill the dir itself
+   { wxMessageBox(_("Directory deletion Failed!?!")); return false; }
+--- a/Redo.cpp
++++ b/Redo.cpp
+@@ -1407,6 +1407,7 @@
+   }
+ 
+                         // If we're here, it's a dir
++{                                         // AmigaOS: wxDir holds a lock on the dir, and a locked dir can't be deleted, so it goes before Rmdir()
+ wxDir dir(PathName->GetPath());           // Use helper class to deal sequentially with each child file & subdir
+ if (!dir.IsOpened())        return false;
+ 
+@@ -1417,6 +1418,7 @@
+     if (!ReallyDelete(&child))            // Slaughter it by recursion, whether it's a dir or file
+         return false;                     // If this fails, bug out
+   }
++}
+   
+ if (!PathName->Rmdir())  return false;    // Finally, kill the dir itself
+ 
