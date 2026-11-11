@@ -8,7 +8,9 @@
 
 4Pane 8.0 runs on AmigaOS 3 (tested 6 Nov 2026 in a 68040 AmiCradle lab): the twin-pane trees and file lists, the toolbar, the XRC dialogs and the first-run wizard. Start it with a double-click on its icon, or from a Shell in its drawer. It needs gfopenpng.datatype for its PNG pictures.
 
-Not done yet: Amiga devices and mounting (4Pane's Linux device and mount code finds nothing here), terminal emulator and archive tools that call Unix programs.
+4Pane looks inside .tar.gz, .tar.bz2, .tar and .zip archives as if they were drawers (checked 11 Nov 2026). The Amiga has one user and one group, and the port answers for them itself (`src/amiga_unix.c`): libsocket's `getgrgid` never comes back here, and the tar reader calls it for every archive.
+
+Not done yet: Amiga devices and mounting (4Pane's Linux device and mount code finds nothing here), terminal emulator, archive tools that call Unix programs, and .tar.xz and .tar.lzma (4Pane needs liblzma for them, which this build leaves out).
 
 ## Building
 

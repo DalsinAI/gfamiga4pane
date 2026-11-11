@@ -2,7 +2,10 @@
  * amiga_unix.c: the Unix calls 4Pane makes that libnix lacks.
  *
  * - Users and groups: the Amiga has one user. The reentrant calls know that
- *   user ("user", the id getuid() gives) and its group ("users").
+ *   user ("user", the id getuid() gives) and its group ("users"), and so
+ *   do getgrgid and getgrent; the toolkit's tar reader calls getgrgid for
+ *   each archive it lists: libsocket's getgrgid never comes back on the Amiga, which
+ *   hung 4Pane on opening a .tar.gz or .tar.bz2.
  * - fstab and the mount table: no such files. They find nothing; the
  *   Amiga's volumes come from DOS.
  * - Pseudo-terminals: none, and no fork: forkpty fails with ENOSYS.
@@ -166,6 +169,28 @@ int getgrgid_r(gid_t gid, struct group *grp, char *buf, size_t buflen, struct gr
         return 0;
     }
     return fill_group(grp, buf, buflen, result);
+}
+
+/* the plain calls, for the toolkit's tar reader (getgrgid) and libsocket's
+ * getgroups (getgrent); with setgrent and endgrent (amiga_pwent.c) they keep
+ * libsocket's getgrent.o out of the link */
+static struct group one_grp;
+static char one_grp_buf[64];
+
+struct group *getgrgid(gid_t gid)
+{
+    struct group *result;
+    if (getgrgid_r(gid, &one_grp, one_grp_buf, sizeof(one_grp_buf), &result) != 0)
+        return NULL;
+    return result;
+}
+
+struct group *getgrent(void)
+{
+    struct group *result;
+    if (getgrent_r(&one_grp, one_grp_buf, sizeof(one_grp_buf), &result) != 0)
+        return NULL;
+    return result;
 }
 
 /* ---- fstab and the mount table: none ---- */
