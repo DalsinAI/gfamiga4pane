@@ -2,6 +2,11 @@
 FP_VERSION=8.0
 FP_URL=https://downloads.sourceforge.net/project/fourpane/8.0/4pane-8.0.tar.gz
 FP_SHA256=0a5f9e08cd284a1edf0f93dc49a8a7faab86f9795c06116e167043b80ee0bafb
+# xz's liblzma, linked in for .tar.xz and .tar.lzma (patch 0009). The release
+# tarball, signed by Lasse Collin (key 3690C240CE51B4670D30AD1C38EE757D69184620)
+XZ_VERSION=5.8.1
+XZ_URL=https://github.com/tukaani-project/xz/releases/download/v5.8.1/xz-5.8.1.tar.gz
+XZ_SHA256=507825b599356c10dca1cd720c9d0d0c9d5400b9de300af00e4d1ea150795543
 # Our own pieces, fetched at these commits
 # GFOpenWX Toolkit main 1c4e5dd, v0.1.0-rc4: tool bars, XRC, the directory control,
 # wizards, HTML help, file URLs and wxARexxPort

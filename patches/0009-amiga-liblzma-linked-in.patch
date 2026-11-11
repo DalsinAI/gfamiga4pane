@@ -1,0 +1,73 @@
+AmigaOS: liblzma linked in, for .tar.xz and .tar.lzma archives
+
+4Pane opens liblzma with wxDynamicLibrary when it starts, and looks inside
+.tar.xz and .tar.lzma archives only when that worked. The Amiga has no
+shared libraries, so the port links liblzma in (AMIGA_STATIC_LZMA, from
+build-4pane.sh): the xz streams take its calls directly, and
+LIBLZMA_LOADED is set at start. m_liblzma stays NULL (patch 0007).
+
+--- a/MyFrame.cpp
++++ b/MyFrame.cpp
+@@ -200,7 +200,9 @@
+       }
+   }
+ 
+-#ifndef NO_LZMA_ARCHIVE_STREAMS
++#if !defined(NO_LZMA_ARCHIVE_STREAMS) && defined(AMIGA_STATIC_LZMA)
++  LIBLZMA_LOADED = true; // AmigaOS: liblzma is linked in (m_liblzma stays NULL)
++#elif !defined(NO_LZMA_ARCHIVE_STREAMS)
+   // See if there's the xz lib available for archive streams
+   #if wxVERSION_NUMBER >= 2900  
+     m_liblzma = new wxDynamicLibrary(wxT("liblzma"), wxDL_LAZY | wxDL_QUIET);
+--- a/Otherstreams.cpp
++++ b/Otherstreams.cpp
+@@ -22,17 +22,24 @@
+ #include "MyFrame.h"
+ #include "Otherstreams.h"
+ 
++#ifdef AMIGA_STATIC_LZMA
++  // AmigaOS: no shared libraries, so liblzma is linked in and its calls are taken directly
++  #define LZMA_SYMBOL(type, name) ((type)&::name)
++#else
++  #define LZMA_SYMBOL(type, name) ((type)(wxGetApp().GetLiblzma()->GetSymbol(wxT(#name))))
++#endif
++
+ XzInputStream::XzInputStream(wxInputStream& Stream, bool use_lzma1 /*= false*/) :  wxFilterInputStream(Stream), m_nBufferPos(0)
+ {
+ wxCHECK_RET(LIBLZMA_LOADED, wxT("We shouldn't be here if liblzma isn't loaded!"));
+ 
+-lzma_stream_decoder = (dl_lzma_stream_decoder)(wxGetApp().GetLiblzma()->GetSymbol(wxT("lzma_stream_decoder")));
++lzma_stream_decoder = LZMA_SYMBOL(dl_lzma_stream_decoder, lzma_stream_decoder);
+ if (!lzma_stream_decoder) { wxLogWarning(wxT("Failed to load symbol 'lzma_stream_decoder'")); return; }
+-lzma_alone_decoder = (dl_lzma_alone_decoder)(wxGetApp().GetLiblzma()->GetSymbol(wxT("lzma_alone_decoder")));
++lzma_alone_decoder = LZMA_SYMBOL(dl_lzma_alone_decoder, lzma_alone_decoder);
+ if (!lzma_alone_decoder) { wxLogWarning(wxT("Failed to load symbol 'lzma_alone_decoder'")); return; }
+-lzma_code = (dl_lzma_code)(wxGetApp().GetLiblzma()->GetSymbol(wxT("lzma_code")));
++lzma_code = LZMA_SYMBOL(dl_lzma_code, lzma_code);
+ if (!lzma_code) { wxLogWarning(wxT("Failed to load symbol 'lzma_code'")); return; }
+-lzma_end = (dl_lzma_end)(wxGetApp().GetLiblzma()->GetSymbol(wxT("lzma_end")));
++lzma_end = LZMA_SYMBOL(dl_lzma_end, lzma_end);
+ if (!lzma_end) { wxLogWarning(wxT("Failed to load symbol 'lzma_end'")); return; }
+ 
+ m_lzStream = (void*) new lzma_stream;
+@@ -132,15 +139,15 @@
+ {
+ wxCHECK_RET(LIBLZMA_LOADED, wxT("We shouldn't be here if liblzma isn't loaded!"));
+ 
+-lzma_easy_encoder = (dl_lzma_easy_encoder)(wxGetApp().GetLiblzma()->GetSymbol(wxT("lzma_easy_encoder")));
++lzma_easy_encoder = LZMA_SYMBOL(dl_lzma_easy_encoder, lzma_easy_encoder);
+ if (!lzma_easy_encoder) { wxLogWarning(wxT("Failed to load symbol 'lzma_easy_encoder'")); return; }
+-lzma_alone_encoder = (dl_lzma_alone_encoder)(wxGetApp().GetLiblzma()->GetSymbol(wxT("lzma_alone_encoder")));
++lzma_alone_encoder = LZMA_SYMBOL(dl_lzma_alone_encoder, lzma_alone_encoder);
+ if (!lzma_alone_encoder) { wxLogWarning(wxT("Failed to load symbol 'lzma_alone_encoder'")); return; }
+-lzma_lzma_preset = (dl_lzma_lzma_preset)(wxGetApp().GetLiblzma()->GetSymbol(wxT("lzma_lzma_preset")));
++lzma_lzma_preset = LZMA_SYMBOL(dl_lzma_lzma_preset, lzma_lzma_preset);
+ if (!lzma_lzma_preset) { wxLogWarning(wxT("Failed to load symbol 'lzma_lzma_preset'")); return; }
+-lzma_code = (dl_lzma_code)(wxGetApp().GetLiblzma()->GetSymbol(wxT("lzma_code")));
++lzma_code = LZMA_SYMBOL(dl_lzma_code, lzma_code);
+ if (!lzma_code) { wxLogWarning(wxT("Failed to load symbol 'lzma_code'")); return; }
+-lzma_end = (dl_lzma_end)(wxGetApp().GetLiblzma()->GetSymbol(wxT("lzma_end")));
++lzma_end = LZMA_SYMBOL(dl_lzma_end, lzma_end);
+ if (!lzma_end) { wxLogWarning(wxT("Failed to load symbol 'lzma_end'")); return; }
+ 
+ m_lzStream = (void*) new lzma_stream;
