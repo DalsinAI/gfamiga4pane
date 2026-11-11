@@ -8,9 +8,11 @@
 
 4Pane 8.0 runs on AmigaOS 3 (tested 6 Nov 2026 in a 68040 AmiCradle lab): the twin-pane trees and file lists, the toolbar, the XRC dialogs and the first-run wizard. Start it with a double-click on its icon, or from a Shell in its drawer. It needs gfopenpng.datatype for its PNG pictures.
 
-4Pane looks inside .tar.gz, .tar.bz2, .tar and .zip archives as if they were drawers (checked 11 Nov 2026). The Amiga has one user and one group, and the port answers for them itself (`src/amiga_unix.c`): libsocket's `getgrgid` never comes back here, and the tar reader calls it for every archive.
+4Pane looks inside .tar.gz, .tar.bz2, .tar.xz, .tar and .zip archives as if they were drawers (checked 11 Nov 2026). The Amiga has one user and one group, and the port answers for them itself (`src/amiga_unix.c`): libsocket's `getgrgid` never comes back here, and the tar reader calls it for every archive.
 
-Not done yet: Amiga devices and mounting (4Pane's Linux device and mount code finds nothing here), terminal emulator, archive tools that call Unix programs, and .tar.xz and .tar.lzma (4Pane needs liblzma for them, which this build leaves out).
+Not done yet: Amiga devices and mounting (4Pane's Linux device and mount code finds nothing here), terminal emulator, and archive tools that call Unix programs.
+
+For .xz and .lzma the build fetches xz-utils at the version `4pane.lock` pins (checked against its SHA-256 there) and links its liblzma in, since the Amiga has no shared liblzma for 4Pane to load (`patches/0009`).
 
 ## Building
 
@@ -55,7 +57,7 @@ Return codes, as OS 3.2's arexx.class: 0 OK, 5 warning, 10 error, 20 unknown com
 
 ## Licence
 
-4Pane is GPL v3 (some parts wxWindows Licence); the patches and build files here are GPL v3.
+4Pane is GPL v3 (some parts wxWindows Licence); the patches and build files here are GPL v3. The liblzma linked into the program comes from xz-utils (Lasse Collin and the Tukaani project) and is under the BSD Zero Clause License.
 
 Designed, tested and delivered by The AmiCradle Team.
 Copyright (c) 2026 AmiCradle Team
