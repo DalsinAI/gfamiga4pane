@@ -8,7 +8,7 @@ XZ_VERSION=5.8.1
 XZ_URL=https://github.com/tukaani-project/xz/releases/download/v5.8.1/xz-5.8.1.tar.gz
 XZ_SHA256=507825b599356c10dca1cd720c9d0d0c9d5400b9de300af00e4d1ea150795543
 # Our own pieces, fetched at these commits
-# GFOpenWX Toolkit main 1c4e5dd, v0.1.0-rc4: tool bars, XRC, the directory control,
+# GFOpenWX Toolkit main, v0.1.0-rc4 and later: tool bars, XRC, the directory control,
 # wizards, HTML help, file URLs and wxARexxPort
 WXT_REPO=https://github.com/DalsinAI/gfopenwxtoolkit
 WXT_COMMIT=2b2db788892b0379438ae7201821b93789610861   # toolkit main: GFOpenLayout UI through gfopenlayout.library 12+ (gfopenwxtoolkit PR 1)

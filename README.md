@@ -6,7 +6,7 @@
 
 ## Needs
 
-`gfopenlayout.library` 12 or later in `LIBS:`. 4pane's windows are drawn by GFOpenLayout through that library, not a copy built into the program (GFOffice Libs ships version 25). Without it 4pane says "This needs gfopenlayout.library 12 or later in LIBS:" and stops.
+`gfopenlayout.library` 12 or later in `LIBS:`. 4Pane's windows are drawn by GFOpenLayout through that library, not a copy built into the program (GFOffice Libs ships version 25). Without it 4Pane says "This needs gfopenlayout.library 12 or later in LIBS:" and stops.
 
 ## Status
 
