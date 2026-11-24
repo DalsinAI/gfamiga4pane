@@ -4,6 +4,10 @@
 
 4Pane is fetched at build time at the version `4pane.lock` pins, and `patches/` is applied to it; nothing third-party is kept in this repository.
 
+## Needs
+
+`gfopenlayout.library` 12 or later in `LIBS:`. 4Pane's windows are drawn by GFOpenLayout through that library, not a copy built into the program (GFOffice Libs ships version 25). Without it 4Pane says "This needs gfopenlayout.library 12 or later in LIBS:" and stops.
+
 ## Status
 
 4Pane 8.0 runs on AmigaOS 3 (tested 6 Nov 2026 in a 68040 AmiCradle lab): the twin-pane trees and file lists, the toolbar, the XRC dialogs and the first-run wizard. Start it with a double-click on its icon, or from a Shell in its drawer. It needs gfopenpng.datatype for its PNG pictures.
